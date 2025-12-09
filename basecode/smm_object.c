@@ -111,6 +111,7 @@ int smmObj_getNodeType(int node_nr)
 int smmObj_getNodeCredit(int node_nr)
 {
 	return(smmObj_board[node_nr]->smm_credit);
+}
 
 int smmObj_getNodeEnergy(int node_nr)
 {
@@ -119,7 +120,8 @@ int smmObj_getNodeEnergy(int node_nr)
 
 char* smmObj_getTypeName(int node_type)
 {
-	return (smmObj_nodeName[node_type]);
+	return (smmNodeName[node_type]);
+}
 
 #if 0
 //element to string
