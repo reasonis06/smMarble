@@ -69,26 +69,37 @@ static char smmNodegradeName[MAX_GRADE][MAX_CHARNAME] = { // array size [7][200]
 
 typedef struct {
 	char smm_name[MAX_CHARNAME];// array size [100][200]	int smm_name;
-	int smm_objTpe;
 	int smm_type;
 	int smm_credit;
 	int smm_energy;
 	int smm_grade;
 } smmObj_object_t;
 
-static smmObj_board_t *smmObj_board[MAX_NODENR];
+static smmObj_object_t *smmObj_board[MAX_NODENR];
 
 //object generation
 int smmObj_genNode(char* name, int type, int credit, int energy)
 {
-		strcpy(smmObj_board[MAX_NODENR].smm_name) = name;
-    smmObj_board[MAX_NODENR].smm_type = type;
-    smmObj_board[MAX_NODENR].smm_credit = credit;
-    smmObj_board[MAX_NODENR].smm_energy = energy;
+	if (smm_nodeNr >= MAX_NODENR) {
+		printf("[ERROR] Board node limit reached. \n");
+		exit(1);
+	}
+	
+	smmObj_board[smm_nodeNr] = (smmObj_object_t*)malloc(sizeof(smmObj_object_t));
+	if (smmObj_board[smm_nodeNr] ==NULL) {
+		printf("[ERROR] malloc failed");
+		exit(1);
+	}
+	
+	strcpy(smmObj_board[smm_nodeNr]->smm_name, name);
+  smmObj_board[smm_nodeNr]->smm_type = type;
+  smmObj_board[smm_nodeNr]->smm_credit = credit;
+	smmObj_board[smm_nodeNr]->smm_energy = energy;
+	smmObj_board[smm_nodeNr]->smm_grade = 0; // initialization
     
-    smm_nodeNr++;
+  smm_nodeNr++;
     
-    return (smm_nodeNr);
+  return (smm_nodeNr);
 
 }
 
@@ -97,26 +108,26 @@ int smmObj_genNode(char* name, int type, int credit, int energy)
 //member retrieving
 char* smmObj_getNodeName(int node_nr)
 {
-	return(smmObj_board[node_nr].smm_name);
+	return(smmObj_board[node_nr]->smm_name);
 }
 
-char* smmObj_getNodeType(int node_nr)
+int smmObj_getNodeType(int node_nr)
 {
-	return(smmObj_board[node_nr].smm_type);
+	return(smmObj_board[node_nr]->smm_type);
 }
 
-char* smmObj_getNodeCredit(int node_nr)
+int smmObj_getNodeCredit(int node_nr)
 {
-	return(smmObj_board[node_nr].smm_credit);
+	return(smmObj_board[node_nr]->smm_credit);
 
-char* smmObj_getNodeEnergy(int node_nr)
+int smmObj_getNodeEnergy(int node_nr)
 {
-	return(smmObj_board[node_nr].smm_energy);
+	return(smmObj_board[node_nr]->smm_energy);
 }
 
-char* smmObj_getTypeName(int node_nr)
+char* smmObj_getTypeName(int node_type)
 {
-	return (smmObj_nodeName[node_type].smm_name);
+	return (smmObj_nodeName[node_type]);
 
 #if 0
 //element to string

@@ -125,13 +125,11 @@ int rolldice(int player)
     c = getchar();
     fflush(stdin);
     
-#if 0
     if (c == 'g')
         printGrades(player);
 
     
     return (rand()%MAX_DICE + 1);
-#endif
 }
 
 
