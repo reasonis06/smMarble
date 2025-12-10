@@ -239,13 +239,47 @@ void actionNode(int player)
 			}
 				
 			case SMMNODE_TYPE_FOODCHANGE:
-				break;
+			{
+   			printf(">>> [FOOD CHANGE: 보충 찬스!] <<<\n");
+    
+    		int card_idx = rand() % food_nr; 
+    
+    		// CARD INFO
+    		char* foodName = smmDb_getFoodCardName(card_idx);
+    		int foodEnergy = smmDb_getFoodCardEnergy(card_idx);
+    
+    		// ENERGY
+    		int current_energy = smmObj_getPlayerEnergy(player);
+    		smmObj_updatePlayerEnergy(player, foodEnergy);
+    
+    		printf(" -> %s drew the card [%s]! Gained %i energy. Energy: %i -> %i\n", 
+           smmObj_getPlayerName(player), foodName, foodEnergy, current_energy, smmObj_getPlayerEnergy(player));
+           
+    		break;
+			}
 				
 			case SMMNODE_TYPE_FESTIVAL:
-				break;
+			{
+    		printf(">>> [FESTIVAL: 축제!] <<<\n");
+    
+    		// festival_nr
+    		int card_idx = rand() % festival_nr;
+    
+    		// 카드 정보 획득 (smm_database.c의 함수 사용 가정)
+    		char* mission = smmDb_getFestivalCardMission(card_idx);
+    
+    		// MISSION
+    		printf(" -> %s drew the card: \"%s\"\n", smmObj_getPlayerName(player), mission);
+    
+    		// 미션 성공/실패 로직은 정의서에 따라 구현되어야 하지만, 현재 단계에서는 출력만 처리
+    		printf(" -> Mission logic needs further implementation based on specific rules.\n");
+    
+    		break;
+			}
 
         //case lecture:
         default:
+					  printf(">>> [Unknown Node Type %i] <<<\n", type);
             break;
     }
 }
@@ -299,9 +333,14 @@ int main(int argc, const char * argv[])
     }
     
     printf("\n\nReading food card component......\n");
-    //while () //read a food parameter set
+    
+    char foodName[MAX_CHARNAME];
+    int foodEnergy;
+    
+    while (fscanf(fp, "%s %i", foodName, &foodEnergy) == 2) //read a food parameter set
     {
         //store the parameter set
+        //food_nr = smmDb_genFoodCard(foodName, foodEnergy);
     }
     fclose(fp);
     printf("Total number of food cards : %i\n", food_nr);
