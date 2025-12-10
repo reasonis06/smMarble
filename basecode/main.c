@@ -102,6 +102,12 @@ void printPlayerStatus(void)
 
 int rolldice(int player)
 {
+		// CHECK EXP STATE 
+    if (smmObj_getExpFlag(player) == 1) {
+        printf(" -> %s is EXPERIMENTING and must stay here this turn.\n", smmObj_getPlayerName(player));
+        return 0; // 주사위 결과 0 반환 (이동 없음)
+    }
+    
     char c;
     printf(" Press any key to roll a dice (press g to see grade): ");
     c = getchar();
@@ -125,14 +131,14 @@ void actionNode(int player)
 		
 	switch(type)
   {
-		case SMMNODE_TYPE_LECTURE:
-		{
+			case SMMNODE_TYPE_LECTURE:
+			{
 				char* lectureName = smmObj_getNodeName(pos);
 				credit = smmObj_getNodeCredit(pos);
 				energy = smmObj_getNodeEnergy(pos);
 				takeLecture(player, lectureName, credit, energy);
 				break;
-		}
+			}
 			case SMMNODE_TYPE_RESTAURANT:
 			{
 				int current_energy = smmObj_getPlayerEnergy(player);
@@ -145,9 +151,47 @@ void actionNode(int player)
            smmObj_getPlayerName(player), energy, current_energy, smmObj_getPlayerEnergy(player));
            
 				break;
+			}
 				
 			case SMMNODE_TYPE_LABORATORY:
-				break;
+			{
+   			int is_exp = smmObj_getExpFlag(player);
+   		  int energy = smmObj_getNodeEnergy(pos);
+    
+    		printf(">>> [LABORATORY] <<<\n");
+
+    		if (is_exp == 1)
+    		{
+        		int target = smmObj_getExpValue(player);
+        		int dice = rolldice(player);
+
+        		// USE ENERGY
+        		smmObj_updatePlayerEnergy(player, -energy);
+        		printf(" -> %s spent %i energy for the experiment. Current Energy: %i.\n", 
+              		 smmObj_getPlayerName(player), energy, smmObj_getPlayerEnergy(player));
+
+        		// SUCCESS CHECK
+        		if (dice >= target)
+        		{
+            		// SUCCESS
+            		smmObj_updateExpFlag(player, 0); 
+            		smmObj_updateExpValue(player, 0);
+            		printf(" -> EXPERIMENT SUCCESS! Dice: %i (Target: %i). Experiment finished.\n", dice, target);
+        		}
+        		else
+        		{
+            		// FAIL
+            		printf(" -> EXPERIMENT FAILED. Dice: %i (Target: %i). Experiment status maintained.\n", dice, target);
+            
+        		}
+    		}
+    		else
+    		{
+        		// PASS
+        		printf(" -> %s just passing through the Laboratory. No action taken.\n", smmObj_getPlayerName(player));
+    		}
+    		break;
+			}
 				
 			case SMMNODE_TYPE_HOME:
 			{
@@ -174,7 +218,25 @@ void actionNode(int player)
 
 				
 			case SMMNODE_TYPE_GOTOLAB:
-				break;
+			{
+  		  // Exp ING
+   		  smmObj_updateExpFlag(player, 1);
+    
+  	    // RANDOM VALUE
+  	    int target_value = rand() % MAX_DICE + 1; 
+    	  smmObj_updateExpValue(player, target_value);
+    
+   		  // MOVE LAB
+   		  smmObj_updatePlayerPos(player, SMMNODE_TYPE_LABORATORY); 
+
+   		  printf(">>> [EXPERIMENTAL] <<<\n");
+   		  printf(" -> %s goes into experiment! Target success value: %i. Moving to LABORATORY.\n", 
+          	 smmObj_getPlayerName(player), target_value);
+    
+    		actionNode(player); 
+
+    		break;
+			}
 				
 			case SMMNODE_TYPE_FOODCHANGE:
 				break;
@@ -388,7 +450,7 @@ smmGrade_e takeLecture(int player, char *lectureName, int credit, int energy)
     }
 }
 
-// 5. findGrade 함수 정의
+// 5. findGrade 함수 정의 
 void* findGrade(int player, char *lectureName)
 {
     // 특정 강의의 학점을 찾아 반환하는 로직 구현

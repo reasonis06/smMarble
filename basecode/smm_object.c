@@ -11,8 +11,6 @@
 #include <stdlib.h>
 
 #define MAX_NODENR											100
-#define MAX_NODETYPE   									7
-#define MAX_GRADE      									13
 #define MAX_ACHIEVABLE_GRADE 						9
 
 
@@ -33,6 +31,8 @@ typedef struct {
 	char player_name[MAX_PLAYER][MAX_CHARNAME];
 	int player_energy[MAX_PLAYER];
 	int flag_graduated[MAX_PLAYER];
+	int is_experimenting[MAX_PLAYER]; 
+  int exp_success_value[MAX_PLAYER];
 	smmGradeNode_t *grade_history_head[MAX_PLAYER]; // pointer
 } smm_player_t;
 
@@ -84,6 +84,8 @@ void smmObj_initPlayerFields(int player, int initEnergy)
     smm_players.player_energy[player] = initEnergy;
     smm_players.flag_graduated[player] = 0;
     smm_players.grade_history_head[player] = NULL; 
+    smm_players.is_experimenting[player] = 0;
+    smm_players.exp_success_value[player] = 0;
 }
 
 // 2. Initialization and update function
@@ -226,4 +228,22 @@ smmGradeNode_t* smmObj_findLectureGrade(int player, char *lectureName)
     }
     
     return NULL; // 찾지 못함
+}
+
+
+// EXP STATE Getter/Setter 
+int smmObj_getExpFlag(int player) {
+    return smm_players.is_experimenting[player];
+}
+
+void smmObj_updateExpFlag(int player, int flag) {
+    smm_players.is_experimenting[player] = flag;
+}
+
+int smmObj_getExpValue(int player) {
+    return smm_players.exp_success_value[player];
+}
+
+void smmObj_updateExpValue(int player, int value) {
+    smm_players.exp_success_value[player] = value;
 }

@@ -8,9 +8,9 @@
 #ifndef smm_object_h
 #define smm_object_h
 
-#define MAX_CHARNAME                200
-
-typedef struct smmGradeNode smmGradeNode_t;
+#define MAX_CHARNAME               			 200
+#define MAX_NODETYPE   									7
+#define MAX_GRADE      									13
 
 typedef struct {
 	char smm_name[MAX_CHARNAME];// array size [100][200]
@@ -20,6 +20,7 @@ typedef struct {
 	int smm_grade;
 } smmObj_object_t;
 
+typedef struct smmGradeNode smmGradeNode_t;
 
 typedef enum {
     SMMNODE_TYPE_LECTURE = 0,
@@ -72,6 +73,8 @@ void smmObj_updatePlayerCredit(int player, int credit);
 void smmObj_updatePlayerEnergy(int player, int energy);
 void smmObj_updateGraduatedFlag(int player, int flag);
 char* smmObj_getPlayerName(int player);
+void smmObj_updateExpFlag(int player, int flag);
+void smmObj_updateExpValue(int player, int value);
 
 // Player Set functions 
 void smmObj_setPlayerName(int player, char* name);
@@ -79,6 +82,9 @@ int smmObj_getPlayerPos(int player);
 int smmObj_getPlayerCredit(int player);
 int smmObj_getPlayerEnergy(int player);
 int smmObj_getGraduatedFlag(int player);
+int smmObj_getExpFlag(int player);
+int smmObj_getExpValue(int player);
+
 
 //element to string
 char* smmObj_getTypeName(smmNode_e type); // return node type name(char*)
