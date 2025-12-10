@@ -49,14 +49,14 @@ void generatePlayers(int n, int initEnergy) //generate a new player
 {
 	int i;
 	
-	smmObj_setPlayerNr(n);
+	smmObj_updatePlayerNr(n);
 
 	for (i=0;i<n;i++)
 	{
-		smmObj_setPlayerPos(i, 0);
+		smmObj_updatePlayerPos(i, 0);
 		smmObj_updatePlayerCredit(i, 0);
 		smmObj_updatePlayerEnergy(i, initEnergy);
-		smmObj_setGraduatedFlag(i, 0);
+		smmObj_updateGraduatedFlag(i, 0);
 		
 		printf("Input %i-th player name:", i);
 		char name_buffer[MAX_CHARNAME];
@@ -255,7 +255,7 @@ int main(int argc, const char * argv[])
 	    		printf("Invalid player number!\n");
     }while(player_nr <= 0 || player_nr > MAX_PLAYER);
 	  
-	  smmObj_setPlayerNr(player_nr);
+	  smmObj_updatePlayerNr(player_nr);
 	  
     generatePlayers(player_nr, smmObj_getNodeEnergy(0));
     
