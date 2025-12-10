@@ -128,7 +128,8 @@ int rolldice(int player)
 //action code when a player stays at a node
 void actionNode(int player)
 {
-	int type = smmObj_getNodeType(smm_players.player_pos[player]);
+	int current_pos = smm_players.player_pos[player];
+	int type = smmObj_getNodeType(current_pos);
   int credit;
   int energy;
 		
@@ -136,13 +137,15 @@ void actionNode(int player)
   {
 		case SMMNODE_TYPE_LECTURE:
 		{
-				credit = smmObj_getNodeCredit(player);
-				energy = smmObj_getNodeEnergy(player);
+				credit = smmObj_getNodeCredit(current_pos);
+				energy = smmObj_getNodeEnergy(current_pos);
 				smm_players.player_credit[player] += credit;
 				smm_players.player_energy[player] -= energy;
 				break;
 		}
 			case SMMNODE_TYPE_RESTAURANT:
+				energy = smmObj_getNodeEnergy(player);
+				smm_players.player_energy[player] += energy;
 				break;
 				
 			case SMMNODE_TYPE_LABORATORY:
