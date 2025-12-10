@@ -235,7 +235,7 @@ void actionNode(int player)
    		  printf(" -> %s goes into experiment! Target success value: %i. Moving to LABORATORY.\n", 
           	 smmObj_getPlayerName(player), target_value);
     
-    		actionNode(player); 
+    		//actionNode(player); 
 
     		break;
 			}
@@ -458,14 +458,14 @@ smmGrade_e takeLecture(int player, char *lectureName, int credit, int energy)
 	if (smmObj_findLectureGrade(player, lectureName) != NULL)
     {
         printf("%s: Warning! You have already taken this lecture. Dropped automatically.\n\n", smmObj_getPlayerName(player));
-        return GRADE_F; // 재수강 불가능하다고 가정하고 F 반환 (또는 드랍)
+        return GRADE_F;
     }
     
   if (smmObj_getPlayerEnergy(player) < energy)
     {
-        printf("%s: Not enough energy (%i) to take this lecture (needs %i). Dropped automatically.\n",
+        printf("%s: Not enough energy (%i) to take this lecture (needs %i). Dropped automatically.\n\n",
                 smmObj_getPlayerName(player), smmObj_getPlayerEnergy(player), energy);
-        return GRADE_F; // 에너지 부족으로 수강 불가능 시 F 반환 (또는 드랍)
+        return GRADE_F;
     }
   
   	printf("%s: Current Energy is %i. Take lecture (%i energy)? (y/n): ",
@@ -494,8 +494,8 @@ smmGrade_e takeLecture(int player, char *lectureName, int credit, int energy)
     }
     else
     {
-        printf(" -> %s decided to drop the lecture.\n", smmObj_getPlayerName(player));
-        return GRADE_F; // 드랍 시 F(미이수)와 같은 값 반환
+        printf(" -> %s decided to drop the lecture.\n\n", smmObj_getPlayerName(player));
+        return GRADE_F;
     }
 }
 
