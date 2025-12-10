@@ -340,7 +340,7 @@ int main(int argc, const char * argv[])
     while (fscanf(fp, "%s %i", foodName, &foodEnergy) == 2) //read a food parameter set
     {
         //store the parameter set
-        //food_nr = smmDb_genFoodCard(foodName, foodEnergy);
+        food_nr = smmDb_genFoodCard(foodName, foodEnergy);
     }
     fclose(fp);
     printf("Total number of food cards : %i\n", food_nr);
@@ -355,9 +355,17 @@ int main(int argc, const char * argv[])
     }
     
     printf("\n\nReading festival card component......\n");
-    //while () //read a festival card string
-    {
+    
+    char festMission[MAX_CHARNAME*3];
+    
+		while (fgets(festMission, sizeof(festMission), fp) != NULL) //read a festival card string    
+		{
         //store the parameter set
+        size_t len = strlen(festMission);
+    		if (len > 0 && festMission[len-1] == '\n') {
+        	festMission[len-1] = '\0';
+				}
+				festival_nr = smmDb_genFestivalCard(festMission);
     }
     fclose(fp);
     printf("Total number of festival cards : %i\n", festival_nr);
