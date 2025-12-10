@@ -11,7 +11,6 @@
 #include "smm_database.h"
 #include "smm_object.h"
 
-
 #define BOARDFILEPATH "marbleBoardConfig.txt"
 #define FOODFILEPATH "marbleFoodConfig.txt"
 #define FESTFILEPATH "marbleFestivalConfig.txt"
@@ -54,6 +53,9 @@ void generatePlayers(int n, int initEnergy) //generate a new player
 	for (i=0;i<n;i++)
 	{
 		smmObj_initPlayerFields(i, initEnergy);
+		
+		smmObj_updateExpFlag(i, 0);
+    smmObj_updateExpValue(i, 0);
 		
 		printf("Input %i-th player name:", i);
 		char name_buffer[MAX_CHARNAME];
@@ -109,7 +111,7 @@ int rolldice(int player)
     }
     
     char c;
-    printf(" Press any key to roll a dice (press g to see grade): ");
+    printf("\n Press any key to roll a dice (press g to see grade): ");
     c = getchar();
     fflush(stdin);
     
@@ -146,7 +148,7 @@ void actionNode(int player)
 				energy = smmObj_getNodeEnergy(pos);
 				smmObj_updatePlayerEnergy(player, energy);
 				
-				printf(">>> [RESTAURANT: %s] <<<\n", smmObj_getNodeName(pos));
+				printf("\n>>> [RESTAURANT: %s] <<<\n\n", smmObj_getNodeName(pos));
     		printf(" -> %s gained %i energy. Energy: %i -> %i\n", 
            smmObj_getPlayerName(player), energy, current_energy, smmObj_getPlayerEnergy(player));
            
@@ -158,7 +160,7 @@ void actionNode(int player)
    			int is_exp = smmObj_getExpFlag(player);
    		  int energy = smmObj_getNodeEnergy(pos);
     
-    		printf(">>> [LABORATORY] <<<\n");
+    		printf("\n>>> [LABORATORY] <<<\n\n");
 
     		if (is_exp == 1)
     		{
@@ -201,7 +203,7 @@ void actionNode(int player)
     
    			smmObj_updatePlayerEnergy(player, home_energy);
 
-   			printf(">>> [HOME] <<<\n");
+   			printf("\n>>> [HOME] <<<\n\n");
    			printf(" -> %s arrived at Home. Gained %i energy. Energy: %i -> %i\n", 
            smmObj_getPlayerName(player), home_energy, current_energy, smmObj_getPlayerEnergy(player));
 
@@ -229,7 +231,7 @@ void actionNode(int player)
    		  // MOVE LAB
    		  smmObj_updatePlayerPos(player, SMMNODE_TYPE_LABORATORY); 
 
-   		  printf(">>> [EXPERIMENTAL] <<<\n");
+   		  printf("\n>>> [EXPERIMENTAL] <<<\n\n");
    		  printf(" -> %s goes into experiment! Target success value: %i. Moving to LABORATORY.\n", 
           	 smmObj_getPlayerName(player), target_value);
     
@@ -240,7 +242,7 @@ void actionNode(int player)
 				
 			case SMMNODE_TYPE_FOODCHANGE:
 			{
-   			printf(">>> [FOOD CHANGE: 보충 찬스!] <<<\n");
+   			printf("\n>>> [FOOD CHANGE!] <<<\n\n");
     
     		int card_idx = rand() % food_nr; 
     
@@ -260,7 +262,7 @@ void actionNode(int player)
 				
 			case SMMNODE_TYPE_FESTIVAL:
 			{
-    		printf(">>> [FESTIVAL: 축제!] <<<\n");
+    		printf("\n>>> [FESTIVAL: 축제!] <<<\n\n");
     
     		// festival_nr
     		int card_idx = rand() % festival_nr;
@@ -279,7 +281,7 @@ void actionNode(int player)
 
         //case lecture:
         default:
-					  printf(">>> [Unknown Node Type %i] <<<\n", type);
+					  printf("\n>>> [Unknown Node Type %i] <<<\n\n", type);
             break;
     }
 }
@@ -451,7 +453,7 @@ float calcAverageGrade(int player)
 smmGrade_e takeLecture(int player, char *lectureName, int credit, int energy)
 {
 	char choice;
-	printf("\n>>> [LECTURE: %s (%i Credit)] <<<\n", lectureName, credit);
+	printf("\n>>> [LECTURE: %s (%i Credit)] <<<\n\n", lectureName, credit);
 
 	if (smmObj_findLectureGrade(player, lectureName) != NULL)
     {

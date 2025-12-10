@@ -8,6 +8,8 @@
 #include "smm_common.h"
 #include "smm_database.h"
 
+#define MAX_CHARNAME 100
+
 #define LIST_END            -1
 #define MAX_LIST            LISTNO_OFFSET_GRADE+MAX_PLAYER
 
@@ -221,4 +223,101 @@ void* smmdb_getData(int list_nr, int index)
         printf("[ERROR] smmdb_getData() : there is no data of index %i\n", index);
     
     return obj;
+}
+
+// =========================================================================
+// Food Card Database Functions
+// =========================================================================
+
+// Food Card Data Structure (이 구조체를 smm_database.h에 정의하고 가져와야 함)
+// 임시로 여기에 정의. 실제로는 헤더 파일로 이동해야 합니다.
+typedef struct {
+    char name[MAX_CHARNAME];
+    int energy;
+} smmFoodCard_t;
+
+
+char* smmDb_getFoodCardName(int index)
+{
+    smmFoodCard_t* card = (smmFoodCard_t*)smmdb_getData(LISTNO_FOODCARD, index);
+    if (card != NULL) {
+        return card->name;
+    }
+    return "Unknown Food";
+}
+
+int smmDb_getFoodCardEnergy(int index)
+{
+    smmFoodCard_t* card = (smmFoodCard_t*)smmdb_getData(LISTNO_FOODCARD, index);
+    if (card != NULL) {
+        return card->energy;
+    }
+    return 0;
+}
+
+// Food Card Generator (main.c에서 주석 처리된 부분을 위해 필요할 수 있음)
+int smmDb_genFoodCard(char *foodName, int foodEnergy)
+{
+    // 1. 메모리 할당
+    smmFoodCard_t* newCard = (smmFoodCard_t*)malloc(sizeof(smmFoodCard_t));
+    if (newCard == NULL) {
+        printf("[ERROR] Failed to allocate memory for Food Card\n");
+        return -1;
+    }
+
+    // 2. 데이터 복사
+    strcpy(newCard->name, foodName);
+    newCard->energy = foodEnergy;
+
+    // 3. 리스트에 추가 (LISTNO_FOODCARD는 smm_database.h에 정의되어 있음)
+    if (smmdb_addTail(LISTNO_FOODCARD, newCard) != 0) {
+        free(newCard);
+        return -1;
+    }
+
+    return smmdb_len(LISTNO_FOODCARD); // 현재 카드 개수 반환
+}
+
+
+// =========================================================================
+// Festival Card Database Functions
+// =========================================================================
+
+// Festival Card Data Structure (이 구조체를 smm_database.h에 정의하고 가져와야 함)
+// 임시로 여기에 정의. 실제로는 헤더 파일로 이동해야 합니다.
+typedef struct {
+    char mission[MAX_CHARNAME];
+    // 여기에 미션 성공 여부 등에 필요한 다른 필드를 추가할 수 있습니다.
+} smmFestCard_t;
+
+
+char* smmDb_getFestivalCardMission(int index)
+{
+    smmFestCard_t* card = (smmFestCard_t*)smmdb_getData(LISTNO_FESTCARD, index);
+    if (card != NULL) {
+        return card->mission;
+    }
+    return "Unknown Mission";
+}
+
+// Festival Card Generator (main.c의 카드 로딩 부분을 위해 필요할 수 있음)
+int smmDb_genFestivalCard(char *mission)
+{
+    // 1. 메모리 할당
+    smmFestCard_t* newCard = (smmFestCard_t*)malloc(sizeof(smmFestCard_t));
+    if (newCard == NULL) {
+        printf("[ERROR] Failed to allocate memory for Festival Card\n");
+        return -1;
+    }
+
+    // 2. 데이터 복사
+    strcpy(newCard->mission, mission);
+
+    // 3. 리스트에 추가 (LISTNO_FESTCARD는 smm_database.h에 정의되어 있음)
+    if (smmdb_addTail(LISTNO_FESTCARD, newCard) != 0) {
+        free(newCard);
+        return -1;
+    }
+
+    return smmdb_len(LISTNO_FESTCARD); // 현재 카드 개수 반환
 }
