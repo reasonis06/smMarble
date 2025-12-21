@@ -253,3 +253,20 @@ int smmObj_getExpValue(int player) {
 void smmObj_updateExpValue(int player, int value) {
     smm_players.exp_success_value[player] = value;
 }
+
+// History
+char* smmObj_getHistoryLectureName(struct smmGradeNode* node) {
+    return node->lecture_name;
+}
+
+int smmObj_getHistoryCredit(struct smmGradeNode* node) {
+    return node->credit;
+}
+
+smmGrade_e smmObj_getHistoryGrade(struct smmGradeNode* node) {
+    return node->grade;
+}
+
+struct smmGradeNode* smmObj_getNextHistoryNode(struct smmGradeNode* node) {
+    return node->next;
+}

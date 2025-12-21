@@ -94,4 +94,12 @@ void smmObj_addGradeToHistory(int player, char *lectureName, int credit, smmGrad
 struct smmGradeNode* smmObj_findLectureGrade(int player, char *lectureName);
 struct smmGradeNode* smmObj_getGradeHistoryHead(int player);
 
+// History prototype
+char* smmObj_getHistoryLectureName(struct smmGradeNode* node);
+int smmObj_getHistoryCredit(struct smmGradeNode* node);
+smmGrade_e smmObj_getHistoryGrade(struct smmGradeNode* node);
+struct smmGradeNode* smmObj_getNextHistoryNode(struct smmGradeNode* node);
+
+struct smmGradeNode* smmObj_findLectureGrade(int player, char *lectureName);
+
 #endif/* smm_object_h */

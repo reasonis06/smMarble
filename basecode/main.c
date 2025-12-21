@@ -408,13 +408,14 @@ int main(int argc, const char * argv[])
 				else {
 					dice_result = rolldice(turn);
 
-        //4-3. go forward
-        goForward(turn, dice_result);
-        int pos = smmObj_getPlayerPos(turn);
-        printf("node: %s, type: %i (%s)\n", smmObj_getNodeName(pos), smmObj_getNodeType(pos),smmObj_getTypeName(smmObj_getNodeType(pos)));
+        	//4-3. go forward
+        	goForward(turn, dice_result);
+        	int pos = smmObj_getPlayerPos(turn);
+        	printf("node: %s, type: %i (%s)\n", smmObj_getNodeName(pos), smmObj_getNodeType(pos),smmObj_getTypeName(smmObj_getNodeType(pos)));
 
-				//4-4. take action at the destination node of the board
-        actionNode(turn);
+					//4-4. take action at the destination node of the board
+        	actionNode(turn);
+				}
         
         //4-5. next turn
         turn = (turn + 1) % player_nr;
@@ -453,9 +454,29 @@ int isAnyoneGraduated(void)
 // 2. printGrades function define
 void printGrades(int player)
 {
-    // 해당 플레이어의 학점 이력을 출력하는 로직 구현
-    printf("--- Player %d Grade History ---\n", player);
-    // ... 학점 출력 로직 ...
+    struct smmGradeNode* current = smmObj_getGradeHistoryHead(player);
+    
+    if (current == NULL)
+    {
+        printf("-----------------No History-----------------\n");
+        return;
+    }
+
+    printf("----------- Player %d Grade History -----------\n", player);
+    printf("---------------------------------------------------\n");
+    printf("%-20s %-10s %-10s\n", "lecture", "credit", "grade");
+    printf("---------------------------------------------------\n");
+
+    while (current != NULL)
+    {
+        printf("%-20s %-10d %-10s\n", 
+               smmObj_getHistoryLectureName(current),
+               smmObj_getHistoryCredit(current), 
+               smmObj_getGradeName(smmObj_getHistoryGrade(current)));
+        
+        current = smmObj_getNextHistoryNode(current);
+    }
+    printf("--------------------------------------------------\n");
 }
 
 // 3. calcAverageGrade 함수 정의
@@ -522,5 +543,5 @@ void* findGrade(int player, char *lectureName)
 {
     // 특정 강의의 학점을 찾아 반환하는 로직 구현
     // 현재는 미구현이므로 임시로 NULL 반환
-    return NULL;
+    return (void*)smmObj_findLectureGrade(player, lectureName);
 }
