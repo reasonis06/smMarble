@@ -102,24 +102,27 @@ void printPlayerStatus(void)
 
 
 
-int rolldice(int player)
+	int rolldice(int player)
 {
-		// CHECK EXP STATE 
-    if (smmObj_getExpFlag(player) == 1) {
-        printf(" -> %s is EXPERIMENTING and must stay here this turn.\n", smmObj_getPlayerName(player));
-        return 0; // 주사위 결과 0 반환 (이동 없음)
-    }
-    
     char c;
-    printf("\n Press any key to roll a dice (press g to see grade): ");
+    // messege
+    printf("\n[%s's Turn] Press any key to roll a dice (press 'g' to see grade history): ", 
+            smmObj_getPlayerName(player));
+    
+    // keyboard input 
     c = getchar();
     fflush(stdin);
     
-    if (c == 'g')
+    // input 'g'
+    if (c == 'g' || c == 'G') {
         printGrades(player);
-
+        printf("Press any key to continue with the dice roll...");
+        getchar();
+        fflush(stdin);
+    }
     
-    return (rand()%MAX_DICE + 1);
+    // random dice number
+    return (rand() % MAX_DICE + 1);
 }
 
 
@@ -221,21 +224,10 @@ void actionNode(int player)
 				
 			case SMMNODE_TYPE_GOTOLAB:
 			{
-  		  // Exp ING
-   		  smmObj_updateExpFlag(player, 1);
-    
-  	    // RANDOM VALUE
-  	    int target_value = rand() % MAX_DICE + 1; 
-    	  smmObj_updateExpValue(player, target_value);
-    
-   		  // MOVE LAB
-   		  smmObj_updatePlayerPos(player, SMMNODE_TYPE_LABORATORY); 
-
-   		  printf("\n>>> [EXPERIMENTAL] <<<\n\n");
-   		  printf(" -> %s goes into experiment! Target success value: %i. Moving to LABORATORY.\n", 
-          	 smmObj_getPlayerName(player), target_value);
-    
-    		//actionNode(player); 
+				printf("Go to Laboratory!\n");
+        smmObj_updatePlayerPos(player, 2); // 실험실(2번 노드)로 이동
+        smmObj_updateExpFlag(player, 1);   // 실험 상태 ON
+        smmObj_updateExpValue(player, 4);  // 목표값 설정
 
     		break;
 			}
@@ -396,25 +388,50 @@ int main(int argc, const char * argv[])
     while (isAnyoneGraduated() == 0) //is anybody graduated?
     {
         int dice_result;
+    		int pos = smmObj_getPlayerPos(turn);
         
         //4-1. initial printing
         printPlayerStatus();
         
         //4-2. dice rolling (if not in experiment)
-        dice_result = rolldice(turn);
-        
+        if (smmObj_getExpFlag(turn) == 1) {
+					dice_result = rolldice(turn);
+        	int target = smmObj_getExpValue(turn);
+       		if (dice_result >= target) {
+           		smmObj_updateExpFlag(turn, 0); // 탈출 성공
+           		printf("Success! You can move next turn.\n");
+        	}
+					else {
+            printf("Failed to escape laboratory.\n");
+        	}
+    		}
+				else {
+					dice_result = rolldice(turn);
+
         //4-3. go forward
         goForward(turn, dice_result);
         int pos = smmObj_getPlayerPos(turn);
         printf("node: %s, type: %i (%s)\n", smmObj_getNodeName(pos), smmObj_getNodeType(pos),smmObj_getTypeName(smmObj_getNodeType(pos)));
 
-		//4-4. take action at the destination node of the board
+				//4-4. take action at the destination node of the board
         actionNode(turn);
         
         //4-5. next turn
         turn = (turn + 1) % player_nr;
         
     }
+    
+    // after while loop
+    int i;
+		for (i = 0; i < player_nr; i++) {
+    	if (smmObj_getGraduatedFlag(i)) {
+        printf("\n========================================\n");
+        printf("  GRADUATION CONGRATULATIONS! : %s\n", smmObj_getPlayerName(i));
+        printf("  Total Credit: %d\n", smmObj_getPlayerCredit(i));
+        printGrades(i);
+        printf("========================================\n");
+    	}
+		}
         
     system("PAUSE");
     return 0;
