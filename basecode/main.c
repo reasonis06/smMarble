@@ -226,9 +226,9 @@ void actionNode(int player)
 			case SMMNODE_TYPE_GOTOLAB:
 			{
 				printf("\nGo to Laboratory!\n");
-        smmObj_updatePlayerPos(player, 2); // 실험실(2번 노드)로 이동
-        smmObj_updateExpFlag(player, 1);   // 실험 상태 ON
-        smmObj_updateExpValue(player, target);  // 목표값 설정
+        smmObj_updatePlayerPos(player, 2);
+        smmObj_updateExpFlag(player, 1);
+        smmObj_updateExpValue(player, target);
 
 				printf(" -> Experiment mode ON! Target dice number: %d\n", target);
 
@@ -257,19 +257,16 @@ void actionNode(int player)
 				
 			case SMMNODE_TYPE_FESTIVAL:
 			{
-    		printf("\n>>> [FESTIVAL: 축제!] <<<\n\n");
+    		printf("\n>>> [ENJOY FESTIVAL!] <<<\n\n");
     
     		// festival_nr
     		int card_idx = rand() % festival_nr;
     
-    		// 카드 정보 획득 (smm_database.c의 함수 사용 가정)
+    		// get card info
     		char* mission = smmDb_getFestivalCardMission(card_idx);
     
     		// MISSION
     		printf(" -> %s drew the card: \"%s\"\n", smmObj_getPlayerName(player), mission);
-    
-    		// 미션 성공/실패 로직은 정의서에 따라 구현되어야 하지만, 현재 단계에서는 출력만 처리
-    		printf(" -> Mission logic needs further implementation based on specific rules.\n");
     
     		break;
 			}
@@ -482,7 +479,7 @@ void printGrades(int player)
     printf("--------------------------------------------------\n");
 }
 
-// 3. calcAverageGrade 함수 정의
+// 3. calcAverageGrade
 float calcAverageGrade(int player)
 {
     struct smmGradeNode* current = smmObj_getGradeHistoryHead(player);
@@ -570,7 +567,7 @@ smmGrade_e takeLecture(int player, char *lectureName, int credit, int energy)
     }
 }
 
-// 5. findGrade 함수 정의 
+// 5. findGrade
 
 void* findGrade(int player, char *lectureName)
 {
