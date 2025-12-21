@@ -133,7 +133,7 @@ void actionNode(int player)
 	int type = smmObj_getNodeType(pos);
   int credit;
   int energy;
-  int target;
+  int target = (rand() % MAX_DICE + 1);
 		
 	switch(type)
   {
@@ -485,9 +485,39 @@ void printGrades(int player)
 // 3. calcAverageGrade 함수 정의
 float calcAverageGrade(int player)
 {
-    // 평균 학점을 계산하는 로직 구현
-    // 현재는 미구현이므로 임시로 0.0f 반환
-    return 0.0f; 
+    struct smmGradeNode* current = smmObj_getGradeHistoryHead(player);
+    int total_credits = 0;
+    float total_grade_points = 0.0f;
+
+    if (current == NULL) return 0.0f;
+
+    while (current != NULL)
+    {
+        int credit = smmObj_getHistoryCredit(current);
+        smmGrade_e grade = smmObj_getHistoryGrade(current);
+        float grade_value = 0.0f;
+
+        switch(grade) {
+            case GRADE_A_PLUS:  grade_value = 4.3f;break;
+            case GRADE_A_ZERO:  grade_value = 4.0f; break;
+            case GRADE_A_MINUS: grade_value = 3.7f; break;
+            case GRADE_B_PLUS:  grade_value = 3.3f; break;
+            case GRADE_B_ZERO:  grade_value = 3.0f; break;
+            case GRADE_B_MINUS: grade_value = 2.7f; break;
+            case GRADE_C_PLUS:  grade_value = 2.3f; break;
+            case GRADE_C_ZERO:  grade_value = 2.0f; break;
+            case GRADE_C_MINUS: grade_value = 1.7f; break;
+            default:            grade_value = 0.0f; break;
+        }
+
+        total_grade_points += (grade_value * credit);
+        total_credits += credit;
+
+        current = smmObj_getNextHistoryNode(current);
+    }
+
+    if (total_credits == 0) return 0.0f;
+    return total_grade_points / total_credits;
 }
 
 // 4. takeLecture function define
