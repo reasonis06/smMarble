@@ -1,20 +1,21 @@
 //
-//  smm_object.c
+//  main.c
 //  SMMarble
 //
-//  Created by Seongeun Lee on 2025/12/10.
+//  Created by Seongeun Lee on 2025/12/21.
 //
 
 #include "smm_common.h"
 #include "smm_object.h"
+#include "smm_database.h"
 #include <string.h>
 #include <stdlib.h>
 
-#define MAX_NODENR 100
 #define MAX_NODETYPE 7
 #define MAX_GRADE 13
 #define MAX_ACHIEVABLE_GRADE 9
 
+// Struct
 typedef struct {
     int player_pos[MAX_PLAYER];
     int player_credit[MAX_PLAYER];
@@ -28,8 +29,6 @@ typedef struct {
 
 static smm_player_t smm_players;
 static int smm_PlayerNr = 0;
-static int smm_nodeNr = 0;
-static smmObj_t *smmObj_board[MAX_NODENR]; 
 
 static char smmNodeName[MAX_NODETYPE][MAX_CHARNAME] = {
     "lecture", "restaurant", "laboratory", "home", "gotlab", "foodchange", "festival"
@@ -39,7 +38,27 @@ static char smmGradeName[MAX_GRADE][MAX_CHARNAME] = {
     "A+", "A0", "A-", "B+", "B0", "B-", "C+", "C0", "C-", "D+", "D0", "D-", "F"
 };
 
-// Player
+// object function
+void* smmObj_genObject(char* name, int type, int credit, int energy, char* mission) {
+    smmObj_t* obj = (smmObj_t*)malloc(sizeof(smmObj_t));
+    if (obj != NULL) {
+        if (name != NULL) strcpy(obj->smm_name, name);
+        else obj->smm_name[0] = '\0';
+        
+        obj->smm_type = type;
+        obj->smm_credit = credit;
+        obj->smm_energy = energy;
+        
+        if (mission != NULL) strcpy(obj->smm_mission, mission);
+        else obj->smm_mission[0] = '\0';
+        
+        obj->smm_grade = 0;
+        obj->next = NULL;
+    }
+    return (void*)obj;
+}
+
+// player function
 void smmObj_updatePlayerNr(int n) { smm_PlayerNr = n; }
 int smmObj_getPlayerNr(void) { return smm_PlayerNr; }
 
@@ -64,44 +83,37 @@ int smmObj_getPlayerCredit(int player) { return smm_players.player_credit[player
 int smmObj_getPlayerEnergy(int player) { return smm_players.player_energy[player]; }
 int smmObj_getGraduatedFlag(int player) { return smm_players.flag_graduated[player]; }
 
-// GenNode
-int smmObj_genNode(char* name, int type, int credit, int energy) {
-    if (smm_nodeNr >= MAX_NODENR) return -1;
-    
-    smmObj_board[smm_nodeNr] = (smmObj_t*)malloc(sizeof(smmObj_t));
-    if (smmObj_board[smm_nodeNr] == NULL) return -1;
-    
-    strcpy(smmObj_board[smm_nodeNr]->smm_name, name);
-    smmObj_board[smm_nodeNr]->smm_type = type;
-    smmObj_board[smm_nodeNr]->smm_credit = credit;
-    smmObj_board[smm_nodeNr]->smm_energy = energy;
-    smmObj_board[smm_nodeNr]->smm_grade = 0;
-    smmObj_board[smm_nodeNr]->next = NULL;
-
-    return (++smm_nodeNr);
+// node info
+char* smmObj_getNodeName(int node_nr) {
+    smmObj_t* node = (smmObj_t*)smmdb_getData(LISTNO_NODE, node_nr);
+    return (node != NULL) ? node->smm_name : NULL;
+}
+int smmObj_getNodeType(int node_nr) {
+    smmObj_t* node = (smmObj_t*)smmdb_getData(LISTNO_NODE, node_nr);
+    return (node != NULL) ? node->smm_type : -1;
+}
+int smmObj_getNodeCredit(int node_nr) {
+    smmObj_t* node = (smmObj_t*)smmdb_getData(LISTNO_NODE, node_nr);
+    return (node != NULL) ? node->smm_credit : 0;
+}
+int smmObj_getNodeEnergy(int node_nr) {
+    smmObj_t* node = (smmObj_t*)smmdb_getData(LISTNO_NODE, node_nr);
+    return (node != NULL) ? node->smm_energy : 0;
 }
 
-char* smmObj_getNodeName(int node_nr) { return smmObj_board[node_nr]->smm_name; }
-int smmObj_getNodeType(int node_nr) { return smmObj_board[node_nr]->smm_type; }
-int smmObj_getNodeCredit(int node_nr) { return smmObj_board[node_nr]->smm_credit; }
-int smmObj_getNodeEnergy(int node_nr) { return smmObj_board[node_nr]->smm_energy; }
-
-// Grade
+// common
 char* smmObj_getTypeName(smmNode_e type) { return smmNodeName[type]; }
 char* smmObj_getGradeName(smmGrade_e grade) { return smmGradeName[grade]; }
 smmGrade_e smmObj_getRandomGrade(void) { return (smmGrade_e)(rand() % MAX_ACHIEVABLE_GRADE); }
 
+// history
 void smmObj_addGradeToHistory(int player, char *lectureName, int credit, smmGrade_e grade) {
-    smmObj_t *newNode = (smmObj_t *)malloc(sizeof(smmObj_t));
+    smmObj_t *newNode = (smmObj_t*)smmObj_genObject(lectureName, 0, credit, 0, NULL);
     if (newNode == NULL) return;
-    
-    strcpy(newNode->smm_name, lectureName);
-    newNode->smm_credit = credit;
     newNode->smm_grade = (int)grade;
     newNode->next = smm_players.grade_history_head[player];
     smm_players.grade_history_head[player] = newNode;
 }
-
 smmObj_t* smmObj_findLectureGrade(int player, char *lectureName) {
     smmObj_t *current = smm_players.grade_history_head[player];
     while (current != NULL) {
@@ -110,14 +122,13 @@ smmObj_t* smmObj_findLectureGrade(int player, char *lectureName) {
     }
     return NULL;
 }
-
 smmObj_t* smmObj_getGradeHistoryHead(int player) { return smm_players.grade_history_head[player]; }
 char* smmObj_getHistoryLectureName(smmObj_t* node) { return node->smm_name; }
 int smmObj_getHistoryCredit(smmObj_t* node) { return node->smm_credit; }
 smmGrade_e smmObj_getHistoryGrade(smmObj_t* node) { return (smmGrade_e)node->smm_grade; }
 smmObj_t* smmObj_getNextHistoryNode(smmObj_t* node) { return node->next; }
 
-// EXP
+// exp
 int smmObj_getExpFlag(int player) { return smm_players.is_experimenting[player]; }
 void smmObj_updateExpFlag(int player, int flag) { smm_players.is_experimenting[player] = flag; }
 int smmObj_getExpValue(int player) { return smm_players.exp_success_value[player]; }

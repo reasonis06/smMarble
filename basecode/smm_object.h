@@ -2,7 +2,7 @@
 //  smm_object.h
 //  SMMarble object
 //
-//  Created by Seongeun Lee on 2025/12/10.
+//  Created by Seongeun Lee on 2025/12/21.
 //
 
 #ifndef smm_object_h
@@ -18,10 +18,9 @@ typedef struct smmObj {
     int smm_energy;
     char smm_mission[MAX_CHARNAME * 3];
     int smm_grade;
-    struct smmObj* next; // 연결 리스트용 포인터 [cite: 44]
+    struct smmObj* next;
 } smmObj_t;
 
-// Type
 typedef smmObj_t smmGradeNode_t;
 
 typedef enum {
@@ -41,17 +40,13 @@ typedef enum {
     GRADE_D_PLUS, GRADE_D_ZERO, GRADE_D_MINUS, GRADE_F
 } smmGrade_e;
 
-// Prototype
-int smmObj_genNode(char* name, int type, int credit, int energy);
+// common function
+void* smmObj_genObject(char* name, int type, int credit, int energy, char* mission);
+
+// Player
 void smmObj_updatePlayerNr(int n);
 int smmObj_getPlayerNr(void);
 void smmObj_initPlayerFields(int player, int initEnergy);
-
-char* smmObj_getNodeName(int node_nr);
-int smmObj_getNodeType(int node_nr);
-int smmObj_getNodeCredit(int node_nr);
-int smmObj_getNodeEnergy(int node_nr);
-
 void smmObj_updatePlayerPos(int player, int pos);
 void smmObj_updatePlayerCredit(int player, int credit);
 void smmObj_updatePlayerEnergy(int player, int energy);
@@ -63,17 +58,20 @@ int smmObj_getPlayerCredit(int player);
 int smmObj_getPlayerEnergy(int player);
 int smmObj_getGraduatedFlag(int player);
 
+// Node Info
+char* smmObj_getNodeName(int node_nr);
+int smmObj_getNodeType(int node_nr);
+int smmObj_getNodeCredit(int node_nr);
+int smmObj_getNodeEnergy(int node_nr);
+
+// Grade & Exp
 char* smmObj_getTypeName(smmNode_e type);
 char* smmObj_getGradeName(smmGrade_e grade);
 smmGrade_e smmObj_getRandomGrade(void);
-
-// Exp
 void smmObj_updateExpFlag(int player, int flag);
 int smmObj_getExpFlag(int player);
 void smmObj_updateExpValue(int player, int value);
 int smmObj_getExpValue(int player);
-
-// Grade
 void smmObj_addGradeToHistory(int player, char *lectureName, int credit, smmGrade_e grade);
 smmObj_t* smmObj_findLectureGrade(int player, char *lectureName);
 smmObj_t* smmObj_getGradeHistoryHead(int player);
